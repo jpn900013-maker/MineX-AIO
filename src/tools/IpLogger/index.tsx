@@ -15,6 +15,8 @@ interface VisitorLog {
     country: string;
     postal: string;
     isp: string;
+    lat?: number;
+    lon?: number;
     userAgent: string;
     referrer: string;
 }
@@ -435,6 +437,20 @@ export default function IpLogger() {
                                                     <Wifi className="w-4 h-4 text-muted-foreground" />
                                                     <span>{visitor.isp}</span>
                                                 </div>
+                                                {visitor.lat && visitor.lon && (
+                                                    <div className="flex items-center gap-2 md:col-span-2 text-xs text-muted-foreground font-mono">
+                                                        <MapPin className="w-4 h-4 text-primary" />
+                                                        <span>{visitor.lat}, {visitor.lon}</span>
+                                                        <a
+                                                            href={`https://www.google.com/maps?q=${visitor.lat},${visitor.lon}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-primary hover:underline ml-2"
+                                                        >
+                                                            Open in Maps
+                                                        </a>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <p className="text-xs text-muted-foreground truncate">
