@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Tv, Play, Copy, Check, RotateCcw, ShieldCheck, Plus, Gamepad2, Music, Clapperboard, Monitor, ArrowLeft } from "lucide-react";
+import { Tv, Play, Copy, Check, RotateCcw, ShieldCheck, Plus, Gamepad2, Music, Clapperboard, Monitor, ArrowLeft, LayoutDashboard, Database, Users as UsersIcon, LogOut } from "lucide-react";
 import { ToolPageLayout } from "@/components/layout/ToolPageLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -9,6 +9,11 @@ interface GeneratedAccount {
     email: string;
     password: string;
     full: string;
+}
+
+interface StockAccount {
+    data: string;
+    addedAt: number;
 }
 
 const SERVICES = [
@@ -25,7 +30,7 @@ const SERVICES = [
 ];
 
 export default function AccountGenerator() {
-    const [view, setView] = useState<"LIST" | "RESULT" | "RESTOCK">("LIST");
+    const [view, setView] = useState<"LIST" | "RESULT" | "DASHBOARD" | "ADMIN" | "ADMIN_VIEW_STOCK">("LIST");
     const [selectedService, setSelectedService] = useState("");
     const [account, setAccount] = useState<GeneratedAccount | null>(null);
     const [loading, setLoading] = useState(false);
@@ -34,12 +39,17 @@ export default function AccountGenerator() {
     // Stocks
     const [stocks, setStocks] = useState<Record<string, number>>({});
 
-    // Admin Restock
+    // Admin
     const [restockData, setRestockData] = useState("");
-    const [restockService, setRestockService] = useState(SERVICES[0].id);
+    const [adminService, setAdminService] = useState(SERVICES[0].id);
+    const [stockList, setStockList] = useState<StockAccount[]>([]);
+
+    // Dashboard (History - mock for now or use local)
+    const [history, setHistory] = useState<any[]>([]);
 
     const { toast } = useToast();
     const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+    const token = localStorage.getItem('minex-token') || '';
 
     const fetchStocks = async () => {
         const newStocks: Record<string, number> = {};
@@ -55,8 +65,25 @@ export default function AccountGenerator() {
         setStocks(newStocks);
     };
 
+    const fetchStockList = async (serviceId: string) => {
+        try {
+            const res = await fetch(`${API_URL}/api/generator/${serviceId}/check`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                setStockList(data.accounts);
+            }
+        } catch {
+            toast({ title: "Error", description: "Failed to fetch stock list", variant: "destructive" });
+        }
+    };
+
     useEffect(() => {
         fetchStocks();
+        // Load history from local storage for demo
+        const savedHistory = localStorage.getItem('minex-gen-history');
+        if (savedHistory) setHistory(JSON.parse(savedHistory));
     }, []);
 
     const handleGenerate = async (serviceId: string) => {
@@ -68,7 +95,6 @@ export default function AccountGenerator() {
         setSelectedService(serviceId);
         setLoading(true);
         try {
-            const token = localStorage.getItem('minex-token') || '';
             const res = await fetch(`${API_URL}/api/generator/${serviceId}/generate`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -82,6 +108,16 @@ export default function AccountGenerator() {
                     email: parts[0] || 'Unknown',
                     password: parts[1] || 'Unknown'
                 });
+
+                // Save to history
+                const newHistory = [{
+                    service: serviceId,
+                    data: data.data,
+                    date: new Date().toISOString()
+                }, ...history].slice(0, 10);
+                setHistory(newHistory);
+                localStorage.setItem('minex-gen-history', JSON.stringify(newHistory));
+
                 fetchStocks();
                 setView("RESULT");
             } else {
@@ -98,8 +134,7 @@ export default function AccountGenerator() {
     const handleRestock = async () => {
         if (!restockData.trim()) return;
         try {
-            const token = localStorage.getItem('minex-token') || '';
-            const res = await fetch(`${API_URL}/api/generator/${restockService}/add`, {
+            const res = await fetch(`${API_URL}/api/generator/${adminService}/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,7 +148,6 @@ export default function AccountGenerator() {
                 toast({ title: "Restock Successful", description: `Added ${data.added} accounts.` });
                 setRestockData("");
                 fetchStocks();
-                setView("LIST");
             } else {
                 toast({ title: "Restock Failed", description: data.error, variant: "destructive" });
             }
@@ -122,16 +156,7 @@ export default function AccountGenerator() {
         }
     };
 
-    const copyAccount = () => {
-        if (account) {
-            navigator.clipboard.writeText(account.full);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-            toast({ title: "Copied!", description: "Details copied to clipboard" });
-        }
-    };
-
-    // Custom Styles matching source
+    // UI Renderers
     const styles = {
         bg: "bg-[#0B0B0F]",
         cardBg: "bg-[#141418]",
@@ -142,25 +167,18 @@ export default function AccountGenerator() {
     };
 
     if (view === "RESULT" && account) {
-        // Match show.html UI
         return (
             <div className={`min-h-[calc(100vh-4rem)] flex items-center justify-center ${styles.bg}`}>
                 <div className={`${styles.cardBg} ${styles.cardBorder} p-10 rounded-xl text-center w-[420px] shadow-2xl`}>
                     <h1 className={`${styles.purpleText} text-2xl font-bold mb-6`}>Your Generated Account</h1>
-
                     <div className="bg-[#1C1C20] p-4 rounded-lg text-white mb-6 border border-white/10 break-all shadow-inner font-mono">
                         {account.full}
                     </div>
-
                     <div className="flex flex-col gap-3">
-                        <Button onClick={copyAccount} className={`${styles.purpleBtn} w-full text-white font-bold py-6`}>
-                            {copied ? "✅ Copied!" : "📋 Copy"}
+                        <Button onClick={() => { navigator.clipboard.writeText(account.full); toast({ title: "Copied" }); }} className={`${styles.purpleBtn} w-full text-white font-bold py-6`}>
+                            📋 Copy
                         </Button>
-                        <Button
-                            onClick={() => setView("LIST")}
-                            variant="ghost"
-                            className="bg-transparent border border-white/10 text-white hover:bg-white/5 hover:text-[#8B5CF6] w-full py-6"
-                        >
+                        <Button onClick={() => setView("LIST")} variant="ghost" className="bg-transparent border border-white/10 text-white hover:bg-white/5 hover:text-[#8B5CF6] w-full py-6">
                             ⬅ Back to Generator
                         </Button>
                     </div>
@@ -169,35 +187,137 @@ export default function AccountGenerator() {
         );
     }
 
-    if (view === "RESTOCK") {
+    if (view === "DASHBOARD") {
         return (
-            <ToolPageLayout title="Admin Restock" description="Add accounts to database" icon={ShieldCheck}>
-                <div className={`max-w-2xl mx-auto ${styles.cardBg} ${styles.cardBorder} p-8 rounded-xl`}>
-                    <div className="space-y-4">
-                        <select
-                            className="w-full bg-[#1C1C20] border-white/10 rounded p-2 text-white"
-                            value={restockService}
-                            onChange={(e) => setRestockService(e.target.value)}
-                        >
-                            {SERVICES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                        <Textarea
-                            placeholder="email:password&#10;user:pass"
-                            value={restockData}
-                            onChange={(e) => setRestockData(e.target.value)}
-                            className="font-mono text-xs bg-[#1C1C20] border-white/10 min-h-[200px]"
-                        />
-                        <div className="flex gap-4">
-                            <Button onClick={handleRestock} className={`${styles.purpleBtn} flex-1`}>Add Accounts</Button>
-                            <Button onClick={() => setView("LIST")} variant="outline" className="flex-1 bg-transparent text-white border-white/10">Cancel</Button>
+            <div className={`min-h-screen ${styles.bg} p-8 text-white font-sans max-w-5xl mx-auto`}>
+                <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                    <h1 className={`${styles.purpleText} text-2xl font-bold`}>Dashboard</h1>
+                    <Button onClick={() => setView("LIST")} variant="outline" className="border-white/20 text-white hover:text-[#8B5CF6]">Back to Home</Button>
+                </div>
+
+                <div className={`${styles.cardBg} ${styles.cardBorder} rounded-xl p-6 mb-8`}>
+                    <h2 className={`${styles.purpleText} text-xl font-bold mb-4`}>Quick Actions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div onClick={() => setView("LIST")} className="bg-[#1C1C20] p-4 rounded-lg border border-white/5 hover:-translate-y-1 transition-transform cursor-pointer">
+                            <h3 className="text-[#8B5CF6] font-bold mb-1">Generate Accounts</h3>
+                            <p className="text-gray-400 text-sm">Browse available services</p>
+                        </div>
+                        <div className="bg-[#1C1C20] p-4 rounded-lg border border-white/5 hover:-translate-y-1 transition-transform cursor-pointer">
+                            <h3 className="text-[#8B5CF6] font-bold mb-1">Tutorial</h3>
+                            <p className="text-gray-400 text-sm">Learn how to use</p>
                         </div>
                     </div>
                 </div>
-            </ToolPageLayout>
+
+                <div className={`${styles.cardBg} ${styles.cardBorder} rounded-xl p-6`}>
+                    <h2 className={`${styles.purpleText} text-xl font-bold mb-4`}>Recent History</h2>
+                    {history.length > 0 ? (
+                        <div className="space-y-3">
+                            {history.map((item, i) => (
+                                <div key={i} className="bg-[#1C1C20] p-4 rounded-lg flex justify-between items-center border border-white/5 hover:bg-[#23232b]">
+                                    <div>
+                                        <div className="text-[#8B5CF6] font-bold">{SERVICES.find(s => s.id === item.service)?.name || item.service}</div>
+                                        <div className="font-mono text-sm text-gray-300">{item.data}</div>
+                                    </div>
+                                    <div className="text-xs text-gray-500">{new Date(item.date).toLocaleString()}</div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-10 text-gray-500">No history yet.</div>
+                    )}
+                </div>
+            </div>
         )
     }
 
-    // Match index.html UI
+    if (view === "ADMIN") {
+        return (
+            <div className={`min-h-screen ${styles.bg} p-8 text-white max-w-4xl mx-auto`}>
+                <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                    <h1 className={`${styles.purpleText} text-2xl font-bold`}>Admin Panel</h1>
+                    <Button onClick={() => setView("LIST")} variant="outline">Back to Home</Button>
+                </div>
+
+                <div className={`${styles.cardBg} ${styles.cardBorder} rounded-xl p-6 mb-8`}>
+                    <h2 className="text-xl font-bold mb-4">Stock Management</h2>
+                    <div className="flex gap-4 mb-4">
+                        <select
+                            className="bg-[#1C1C20] border border-white/10 rounded p-2 text-white flex-1"
+                            value={adminService}
+                            onChange={(e) => setAdminService(e.target.value)}
+                        >
+                            {SERVICES.map(s => <option key={s.id} value={s.id}>{s.name} ({stocks[s.id] || 0})</option>)}
+                        </select>
+                        <Button
+                            onClick={() => { fetchStockList(adminService); setView("ADMIN_VIEW_STOCK"); }}
+                            className={`${styles.purpleBtn} text-white`}
+                        >
+                            View All Accounts
+                        </Button>
+                    </div>
+
+                    <Textarea
+                        placeholder="email:password&#10;user:pass"
+                        value={restockData}
+                        onChange={(e) => setRestockData(e.target.value)}
+                        className="font-mono text-xs bg-[#1C1C20] border-white/10 min-h-[150px] mb-4"
+                    />
+                    <Button onClick={handleRestock} className="w-full bg-green-600 hover:bg-green-700 text-white">
+                        Add Accounts
+                    </Button>
+                </div>
+            </div>
+        )
+    }
+
+    if (view === "ADMIN_VIEW_STOCK") {
+        return (
+            <div className={`min-h-screen ${styles.bg} p-8 text-white max-w-4xl mx-auto`}>
+                <div className="flex justify-between items-center mb-8">
+                    <Button onClick={() => setView("ADMIN")} variant="outline" className="border-[#8B5CF6] text-[#8B5CF6] bg-transparent hover:bg-[#8B5CF6]/10">← Back</Button>
+                    <h1 className={`${styles.purpleText} text-2xl font-bold`}>View Accounts - {SERVICES.find(s => s.id === adminService)?.name}</h1>
+                </div>
+
+                <div className={`${styles.cardBg} ${styles.cardBorder} rounded-xl p-6`}>
+                    <div className="flex justify-between items-center bg-[#1C1C20] p-4 rounded-lg mb-4">
+                        <span className="text-gray-400">Total: <span className="text-[#8B5CF6] font-bold">{stockList.length}</span></span>
+                        <Button
+                            onClick={() => {
+                                const text = stockList.map(a => a.data).join('\n');
+                                navigator.clipboard.writeText(text);
+                                toast({ title: "Copied all accounts!" });
+                            }}
+                            className="bg-green-600 hover:bg-green-700 text-white text-sm"
+                        >
+                            📋 Copy All
+                        </Button>
+                    </div>
+
+                    <div className="max-h-[600px] overflow-y-auto space-y-2 pr-2">
+                        {stockList.map((acc, i) => (
+                            <div key={i} className="bg-[#23232b] p-3 rounded flex justify-between items-center hover:bg-[#2a2a32] group">
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                    <span className="text-gray-500 text-xs w-8">#{i + 1}</span>
+                                    <span className="font-mono text-sm break-all">{acc.data}</span>
+                                </div>
+                                <Button
+                                    size="sm"
+                                    onClick={() => { navigator.clipboard.writeText(acc.data); toast({ title: "Copied" }); }}
+                                    className="bg-[#8B5CF6] hover:bg-[#7C3AED] h-8 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    Copy
+                                </Button>
+                            </div>
+                        ))}
+                        {stockList.length === 0 && <div className="text-center py-10 text-gray-500">No accounts found.</div>}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // LIST VIEW (Main)
     return (
         <div className={`min-h-screen ${styles.bg} p-8 font-sans`}>
             {/* Header / Hero */}
@@ -206,321 +326,35 @@ export default function AccountGenerator() {
                 <p className={`${styles.textSecondary} text-lg max-w-2xl mx-auto mb-8`}>
                     Generate premium Minecraft, Netflix, Crunchyroll, Spotify, DisneyPlus, HBO MAX, Roblox, and Xbox accounts at no cost.
                 </p>
-
                 <div className="flex justify-center gap-4">
-                    <Button onClick={() => { }} className={`${styles.purpleBtn} text-white px-8`}>Get Started</Button>
-                    <Button
-                        onClick={() => setView("RESTOCK")}
-                        variant="outline"
-                        className="bg-transparent border border-white/20 text-white hover:text-[#8B5CF6] hover:border-[#8B5CF6] px-8"
-                    >
-                        Restock (Admin)
-                    </Button>
+                    <Button className={`${styles.purpleBtn} text-white px-8`}>Get Started</Button>
+                    <Button onClick={() => setView("DASHBOARD")} variant="outline" className="bg-transparent border border-white/20 text-white hover:text-[#8B5CF6] hover:border-[#8B5CF6] px-8">Dashboard</Button>
+                    <Button onClick={() => setView("ADMIN")} variant="ghost" className="text-white/20 hover:text-white">Admin</Button>
                 </div>
             </div>
 
             {/* Services Grid */}
             <h2 className="text-3xl font-bold text-center text-white mb-2">Available Services</h2>
-            <p className="text-center text-[#b3b3b3] mb-12">Choose a generator below via our premium system.</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto mt-10">
                 {SERVICES.map((s) => (
                     <div key={s.id} className={`${styles.cardBg} ${styles.cardBorder} rounded-xl p-8 flex flex-col justify-between hover:-translate-y-2 hover:shadow-[0_10px_25px_rgba(139,92,246,0.3)] transition-all duration-300 group text-center`}>
                         <div className="bg-[#1F1F23] rounded-xl w-[140px] h-[140px] mx-auto mb-6 flex items-center justify-center p-4">
                             <s.icon className="w-16 h-16 text-[#8B5CF6] group-hover:scale-110 transition-transform duration-300" />
                         </div>
-
                         <div>
                             <h3 className="text-xl font-bold text-white mb-2">{s.name}</h3>
                             <p className={`${styles.textSecondary} text-sm mb-6 min-h-[40px]`}>{s.desc}</p>
-
-                            <div className="flex flex-col gap-2">
-                                <Button
-                                    onClick={() => handleGenerate(s.id)}
-                                    disabled={loading || stocks[s.id] === 0}
-                                    className={`${styles.purpleBtn} w-full text-white font-semibold py-6`}
-                                >
-                                    {loading && selectedService === s.id ? "Generating..." : "Generate"}
-                                </Button>
-                                <span className={`text-xs ${stocks[s.id] > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                    {stocks[s.id] !== undefined ? `${stocks[s.id]} Stock` : 'Checking...'}
-                                </span>
-                            </div>
+                            <Button
+                                onClick={() => handleGenerate(s.id)}
+                                disabled={loading || stocks[s.id] === 0}
+                                className={`${styles.purpleBtn} w-full text-white font-semibold py-6`}
+                            >
+                                {loading && selectedService === s.id ? "Generating..." : "Generate"}
+                            </Button>
                         </div>
                     </div>
                 ))}
             </div>
-
-            {/* Footer */}
-            <footer className="mt-20 pt-10 border-t border-white/5 text-center text-[#A3A3A3]">
-                <h3 className={`${styles.purpleText} font-bold text-lg mb-2`}>Mine Alts</h3>
-                <p className="text-sm">Generate premium accounts at no cost, a very nice interface.</p>
-                <p className="text-xs mt-4">For educational purposes only.</p>
-            </footer>
         </div>
-    );
-}
-
-interface GeneratedAccount {
-    email: string;
-    password: string;
-    full: string;
-}
-
-const SERVICES = [
-    { id: "minecraft", name: "Minecraft", icon: Gamepad2 },
-    { id: "netflix", name: "Netflix", icon: Tv },
-    { id: "spotify", name: "Spotify", icon: Music },
-    { id: "hbomax", name: "HBO Max", icon: Tv },
-    { id: "disney", name: "Disney+", icon: Tv },
-    { id: "crunchyroll", name: "Crunchyroll", icon: Clapperboard },
-    { id: "xbox", name: "Xbox Game Pass", icon: Gamepad2 },
-    { id: "xboxultimate", name: "Xbox Ultimate", icon: Gamepad2 },
-    { id: "roblox", name: "Roblox", icon: Gamepad2 },
-    { id: "steam", name: "Steam", icon: Monitor },
-];
-
-export default function AccountGenerator() {
-    const [service, setService] = useState("disney");
-    const [stock, setStock] = useState<number | null>(null);
-    const [account, setAccount] = useState<GeneratedAccount | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [copied, setCopied] = useState(false);
-
-    // Admin/Restock State
-    const [showRestock, setShowRestock] = useState(false);
-    const [restockData, setRestockData] = useState("");
-
-    const { toast } = useToast();
-    const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
-
-    const fetchStock = async () => {
-        try {
-            const res = await fetch(`${API_URL}/api/generator/${service}/stock`);
-            const data = await res.json();
-            if (data.success) {
-                setStock(data.count);
-            }
-        } catch {
-            setStock(0);
-        }
-    };
-
-    useEffect(() => {
-        fetchStock();
-        setAccount(null); // Reset generated account on service switch
-    }, [service]);
-
-    const handleGenerate = async () => {
-        if (stock === 0) {
-            toast({ title: "Out of Stock", description: "Please wait for a restock.", variant: "destructive" });
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const token = localStorage.getItem('minex-token') || '';
-            const res = await fetch(`${API_URL}/api/generator/${service}/generate`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                const parts = data.data.split(':');
-                setAccount({
-                    full: data.data,
-                    email: parts[0] || 'Unknown',
-                    password: parts[1] || 'Unknown'
-                });
-                fetchStock(); // Update stock
-                toast({ title: "Account Generated!", description: `Enjoy your ${service} account.` });
-            } else {
-                toast({ title: "Error", description: data.error || "Failed to generate", variant: "destructive" });
-                if (data.error === 'Out of stock') fetchStock();
-            }
-        } catch {
-            toast({ title: "Error", description: "Failed to connect to server", variant: "destructive" });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRestock = async () => {
-        if (!restockData.trim()) return;
-
-        try {
-            const token = localStorage.getItem('minex-token') || '';
-            const res = await fetch(`${API_URL}/api/generator/${service}/add`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ accounts: restockData })
-            });
-            const data = await res.json();
-
-            if (data.success) {
-                toast({ title: "Restock Successful", description: `Added ${data.added} accounts to ${service}.` });
-                setRestockData("");
-                setShowRestock(false);
-                fetchStock();
-            } else {
-                toast({ title: "Restock Failed", description: data.error, variant: "destructive" });
-            }
-        } catch {
-            toast({ title: "Error", description: "Failed to restock", variant: "destructive" });
-        }
-    };
-
-    const copyToClipboard = () => {
-        if (account) {
-            navigator.clipboard.writeText(account.full);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-            toast({ title: "Copied!", description: "Account copied to clipboard" });
-        }
-    };
-
-    const CurrentIcon = SERVICES.find(s => s.id === service)?.icon || Tv;
-
-    return (
-        <ToolPageLayout
-            title="Account Generator"
-            description="Generate premium accounts for various services"
-            icon={CurrentIcon}
-            category="Generator"
-        >
-            <div className="grid md:grid-cols-2 gap-8">
-                {/* Generator Section */}
-                <div className="space-y-6">
-                    <div className="bg-muted/30 border rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 min-h-[400px]">
-
-                        {/* Service Selector */}
-                        <div className="w-full max-w-[250px]">
-                            <Select value={service} onValueChange={setService}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Service" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {SERVICES.map(s => (
-                                        <SelectItem key={s.id} value={s.id}>
-                                            <div className="flex items-center gap-2">
-                                                <s.icon className="w-4 h-4" />
-                                                {s.name}
-                                            </div>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Stock Counter */}
-                        <div className="flex items-center gap-2 bg-background/50 px-4 py-2 rounded-full border">
-                            <ShieldCheck className="w-4 h-4 text-green-500" />
-                            <span className="text-sm font-medium">
-                                {SERVICES.find(s => s.id === service)?.name} Stock: {stock !== null ? stock : '...'}
-                            </span>
-                        </div>
-
-                        {!account ? (
-                            <div className="space-y-4 w-full flex flex-col items-center">
-                                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 animate-in zoom-in duration-300">
-                                    <CurrentIcon className="w-10 h-10 text-primary" />
-                                </div>
-                                <h2 className="text-2xl font-bold">Generate Account</h2>
-                                <p className="text-muted-foreground w-full max-w-[300px]">
-                                    Click below to generate a fresh premium account for {SERVICES.find(s => s.id === service)?.name}
-                                </p>
-                                <Button
-                                    size="lg"
-                                    onClick={handleGenerate}
-                                    disabled={loading || stock === 0}
-                                    className="w-full max-w-[200px]"
-                                >
-                                    {loading ? "Generating..." : "Generate Now"}
-                                </Button>
-                            </div>
-                        ) : (
-                            <div className="w-full space-y-6 animate-in fade-in zoom-in duration-300">
-                                <div className="space-y-2">
-                                    <h3 className="text-sm font-medium text-muted-foreground">Email / Username</h3>
-                                    <div className="p-3 bg-background rounded-lg border font-mono text-sm break-all select-all">
-                                        {account.email}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-sm font-medium text-muted-foreground">Password</h3>
-                                    <div className="p-3 bg-background rounded-lg border font-mono text-sm break-all select-all">
-                                        {account.password}
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button onClick={copyToClipboard} className="flex-1 gap-2">
-                                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                        Copy Details
-                                    </Button>
-                                    <Button onClick={() => setAccount(null)} variant="outline">
-                                        Generate Another
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Info / Restock Section */}
-                <div className="space-y-6">
-                    <div className="p-6 border rounded-xl bg-card">
-                        <h3 className="font-semibold mb-4 flex items-center gap-2">
-                            <CurrentIcon className="w-4 h-4" /> Service Info
-                        </h3>
-                        <ul className="space-y-3 text-sm text-muted-foreground">
-                            <li className="flex gap-2">
-                                <Check className="w-4 h-4 text-green-500" />
-                                Premium Subscription Guaranteed
-                            </li>
-                            <li className="flex gap-2">
-                                <Check className="w-4 h-4 text-green-500" />
-                                High Quality Accounts
-                            </li>
-                            <li className="flex gap-2">
-                                <Check className="w-4 h-4 text-green-500" />
-                                Instant Delivery
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Admin Restock Area */}
-                    <div className="p-6 border rounded-xl bg-card">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-semibold">Restock {SERVICES.find(s => s.id === service)?.name}</h3>
-                            <Button variant="ghost" size="sm" onClick={() => setShowRestock(!showRestock)}>
-                                {showRestock ? "Hide" : <Plus className="w-4 h-4" />}
-                            </Button>
-                        </div>
-
-                        {showRestock && (
-                            <div className="space-y-4">
-                                <Textarea
-                                    placeholder="email:password&#10;user:pass"
-                                    value={restockData}
-                                    onChange={(e) => setRestockData(e.target.value)}
-                                    className="font-mono text-xs"
-                                    rows={5}
-                                />
-                                <Button onClick={handleRestock} className="w-full">
-                                    Add Accounts
-                                </Button>
-                                <p className="text-xs text-muted-foreground text-center">
-                                    Format: email:password (one per line)
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </ToolPageLayout>
     );
 }
