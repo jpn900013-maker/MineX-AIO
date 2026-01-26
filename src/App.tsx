@@ -119,6 +119,8 @@ import About from "./pages/About";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import ImageTracker from "./pages/ImageTracker";
+import LinkRedirect from "./pages/LinkRedirect";
 
 const queryClient = new QueryClient();
 
@@ -237,6 +239,10 @@ const AppContent = () => {
       <Route path="/tools/ip-logger" element={<IpLogger />} />
 
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      {/* Tracking/Redirect Routes */}
+      <Route path="/img/:code" element={<ImageTracker />} />
+      <Route path="/:code" element={<LinkRedirect />} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

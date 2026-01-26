@@ -60,7 +60,7 @@ export default function McServerStatus() {
 
     const getServerLocation = async (ip: string): Promise<ServerLocation | null> => {
         try {
-            const response = await fetch(`http://ip-api.com/json/${ip}`);
+            const response = await fetch(`https://ip-api.com/json/${ip}?fields=status,country,countryCode,regionName,city,isp,lat,lon`);
             const data = await response.json();
 
             if (data.status === "success") {
