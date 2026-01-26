@@ -119,13 +119,6 @@
   </noscript>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(function (err) {
-        console.log('SW registration failed:', err);
-      });
-    }
-  </script>
 </body>
 
 </html>
