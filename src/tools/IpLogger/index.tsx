@@ -42,6 +42,52 @@ export default function IpLogger() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { toast } = useToast();
 
+    // Fetch visitors from backend
+    useEffect(() => {
+        const fetchVisitors = async () => {
+            if (!links.length) return;
+
+            const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+            let updated = false;
+            const newLinks = [...links];
+
+            for (let i = 0; i < newLinks.length; i++) {
+                try {
+                    const response = await fetch(`${API_URL}/api/iplogger/visitors/${newLinks[i].code}`);
+                    const data = await response.json();
+
+                    if (data.success && data.visitors) {
+                        // Merge backend visitors with local ones (avoid duplicates by ID)
+                        const existingIds = new Set(newLinks[i].visitors.map(v => v.id));
+                        const backendVisitors = data.visitors.filter((v: any) => !existingIds.has(v.id));
+
+                        if (backendVisitors.length > 0) {
+                            newLinks[i].visitors = [...backendVisitors, ...newLinks[i].visitors];
+                            updated = true;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch visitors", e);
+                }
+            }
+
+            if (updated) {
+                setLinks(newLinks);
+                localStorage.setItem("minex-ip-logger", JSON.stringify(newLinks));
+
+                // Update selected link if it was updated
+                if (selectedLink) {
+                    const updatedSelected = newLinks.find(l => l.id === selectedLink.id);
+                    if (updatedSelected) setSelectedLink(updatedSelected);
+                }
+            }
+        };
+
+        // Poll every 5 seconds
+        const interval = setInterval(fetchVisitors, 5000);
+        return () => clearInterval(interval);
+    }, [links, selectedLink]);
+
     const generateCode = (): string => {
         const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
         let code = "";
