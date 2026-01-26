@@ -227,6 +227,7 @@ const AppContent = () => {
       <Route path="/tools/grammar-checker" element={<GrammarChecker />} />
       <Route path="/tools/code-share" element={<CodeShare />} />
       <Route path="/tools/movie-tracker" element={<MovieTracker />} />
+      <Route path="/tools/disney-generator" element={<DisneyGenerator />} />
 
       <Route path="/tools/yt-tags-extractor" element={<YtTagsExtractor />} />
       <Route path="/tools/yt-description-copy" element={<YtDescriptionCopy />} />
