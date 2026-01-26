@@ -62,6 +62,9 @@ import ImageCompressor from "./tools/ImageCompressor";
 import ImageResizer from "./tools/ImageResizer";
 import ImageConverter from "./tools/ImageConverter";
 
+// Tool imports - Generators
+import DisneyGenerator from "./tools/DisneyGenerator";
+
 // Tool imports - SEO Tools
 import MetaTagGenerator from "./tools/MetaTagGenerator";
 import KeywordDensity from "./tools/KeywordDensity";
