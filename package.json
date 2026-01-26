@@ -10,6 +10,7 @@
     "server:install": "cd server && npm install",
     "setup": "npm install && npm run server:install",
     "build": "vite build",
+    "vercel-build": "npx vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
