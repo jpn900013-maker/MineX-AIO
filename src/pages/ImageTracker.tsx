@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+
 /**
  * ImageTracker Component
  * Handles /img/:code routes for IP Logger tracking links
- * Logs visitor information and displays the tracked image
+ * Fetches image from backend and logs visitor information
  */
 export default function ImageTracker() {
     const { code } = useParams<{ code: string }>();
@@ -15,60 +17,39 @@ export default function ImageTracker() {
     useEffect(() => {
         if (!code) return;
 
-        // Log visitor info
-        const logVisitor = async () => {
+        const loadImage = async () => {
             try {
-                // Fetch IP info
-                const ipResponse = await fetch("http://ip-api.com/json/");
-                const ipData = await ipResponse.json();
+                // Fetch the image from backend - this also logs the visitor
+                const response = await fetch(`${API_URL}/track/${code}`);
 
-                // Load saved links from localStorage
-                const savedLinks = localStorage.getItem("minex-ip-logger");
-                if (savedLinks) {
-                    const links = JSON.parse(savedLinks);
-                    const link = links.find((l: any) => l.code === code);
-
-                    if (link) {
-                        // Add visitor to the link
-                        const visitor = {
-                            id: Date.now().toString(),
-                            timestamp: new Date(),
-                            ip: ipData.query || "Unknown",
-                            city: ipData.city || "Unknown",
-                            region: ipData.regionName || "Unknown",
-                            country: ipData.country || "Unknown",
-                            postal: ipData.zip || "Unknown",
-                            isp: ipData.isp || "Unknown",
-                            userAgent: navigator.userAgent,
-                            referrer: document.referrer || "Direct",
-                        };
-
-                        link.visitors = [visitor, ...(link.visitors || [])];
-
-                        // Save back to localStorage
-                        const updatedLinks = links.map((l: any) =>
-                            l.code === code ? link : l
-                        );
-                        localStorage.setItem("minex-ip-logger", JSON.stringify(updatedLinks));
-
-                        // Set the image to display
-                        setImageUrl(link.imageDataUrl);
-                        setLoading(false);
-                        return;
-                    }
+                if (!response.ok) {
+                    setError("Image not found or link expired");
+                    setLoading(false);
+                    return;
                 }
 
-                // If not found locally, show error
-                setError("Image not found or link expired");
+                // The backend returns the image directly
+                const contentType = response.headers.get("content-type");
+
+                if (contentType?.includes("image")) {
+                    // Backend returns actual image data
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    setImageUrl(url);
+                } else {
+                    // If redirected to external URL, use that
+                    setImageUrl(response.url);
+                }
+
                 setLoading(false);
             } catch (err) {
-                console.error("Error logging visitor:", err);
+                console.error("Error loading image:", err);
                 setError("Failed to load image");
                 setLoading(false);
             }
         };
 
-        logVisitor();
+        loadImage();
     }, [code]);
 
     if (loading) {
@@ -87,7 +68,7 @@ export default function ImageTracker() {
             <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-foreground mb-4">404</h1>
-                    <p className="text-muted-foreground mb-6">{error || "Image not found"}</p>
+                    <p className="text-muted-foreground mb-6">{error || "Failed to load image"}</p>
                     <a href="/" className="text-primary hover:underline">
                         Return to Home
                     </a>
