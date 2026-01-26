@@ -238,7 +238,15 @@ const AppContent = () => {
       <Route path="/tools/link-shortener" element={<LinkShortener />} />
       <Route path="/tools/ip-logger" element={<IpLogger />} />
 
+
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+      {/* Static Pages */}
+      <Route path="/about" element={<About />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/contact" element={<Contact />} />
+
       {/* Tracking/Redirect Routes */}
       <Route path="/img/:code" element={<ImageTracker />} />
       <Route path="/s/:code" element={<LinkRedirect />} />
