@@ -60,18 +60,18 @@ export default function McServerStatus() {
 
     const getServerLocation = async (ip: string): Promise<ServerLocation | null> => {
         try {
-            const response = await fetch(`https://ip-api.com/json/${ip}?fields=status,country,countryCode,regionName,city,isp,lat,lon`);
+            const response = await fetch(`https://ipapi.co/${ip}/json/`);
             const data = await response.json();
 
-            if (data.status === "success") {
+            if (!data.error) {
                 return {
-                    country: data.country,
-                    countryCode: data.countryCode,
-                    region: data.regionName,
-                    city: data.city,
-                    isp: data.isp,
-                    lat: data.lat,
-                    lon: data.lon,
+                    country: data.country_name || "Unknown",
+                    countryCode: data.country_code || "Unknown",
+                    region: data.region || "Unknown",
+                    city: data.city || "Unknown",
+                    isp: data.org || "Unknown",
+                    lat: data.latitude || 0,
+                    lon: data.longitude || 0,
                 };
             }
         } catch {
