@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 /**
  * LinkRedirect Component
- * Handles /:code routes for Link Shortener redirect
+ * Handles /s/:code routes for Link Shortener redirect
  * Looks up the short code and redirects to the original URL
  */
 export default function LinkRedirect() {
@@ -13,17 +13,6 @@ export default function LinkRedirect() {
     useEffect(() => {
         if (!code) {
             navigate("/", { replace: true });
-            return;
-        }
-
-        // Check if this is a known route (not a short link)
-        const knownRoutes = [
-            "login", "register", "dashboard", "admin", "about", "contact",
-            "privacy", "terms", "tools", "search", "img"
-        ];
-
-        if (knownRoutes.includes(code.toLowerCase())) {
-            // This is a known route, let React Router handle it
             return;
         }
 

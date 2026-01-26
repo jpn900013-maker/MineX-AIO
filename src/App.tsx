@@ -241,7 +241,7 @@ const AppContent = () => {
       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
       {/* Tracking/Redirect Routes */}
       <Route path="/img/:code" element={<ImageTracker />} />
-      <Route path="/:code" element={<LinkRedirect />} />
+      <Route path="/s/:code" element={<LinkRedirect />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

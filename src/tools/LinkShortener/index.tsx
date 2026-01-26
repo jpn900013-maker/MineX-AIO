@@ -70,7 +70,7 @@ export default function LinkShortener() {
             id: Date.now().toString(),
             originalUrl: urlToShorten,
             shortCode: code,
-            shortUrl: `${window.location.host}/${code}`, // Dynamic short URL
+            shortUrl: `${window.location.host}/s/${code}`, // Dynamic short URL
             createdAt: new Date(),
             clicks: 0,
         };
@@ -86,7 +86,7 @@ export default function LinkShortener() {
 
     const copyLink = async (link: ShortenedLink) => {
         try {
-            await navigator.clipboard.writeText(`${window.location.origin}/${link.shortCode}`);
+            await navigator.clipboard.writeText(`${window.location.origin}/s/${link.shortCode}`);
             setCopied(link.id);
             toast({ title: "Copied!", description: "Short URL copied to clipboard" });
             setTimeout(() => setCopied(null), 2000);
