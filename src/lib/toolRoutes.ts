@@ -50,7 +50,12 @@ export const toolRoutes: Record<string, string> = {
     // Link Tools
     "Link Shortener": "/tools/link-shortener",
     "Link Analytics": "/tools/link-analytics",
+    "Backlink Checker": "/tools/backlink-checker",
+    "Domain Authority": "/tools/domain-authority",
     "IP Logger": "/tools/ip-logger",
+
+    // Generators
+    "Account Generator": "/tools/account-generator",
 
     // Minecraft Tools
     "MC Server Status": "/tools/mc-server-status",

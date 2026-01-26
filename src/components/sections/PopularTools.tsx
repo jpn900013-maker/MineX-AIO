@@ -71,6 +71,14 @@ import { useNavigate } from "react-router-dom";
 import { getToolRoute, isToolAvailable } from "@/lib/toolRoutes";
 
 const popularTools = [
+  // Generators
+  {
+    title: "Account Generator",
+    description: "Generate premium accounts for Disney+, Netflix, & more",
+    icon: Tv,
+    category: "Generators",
+    isNew: true,
+  },
   // Minecraft Tools
   {
     title: "MC Server Status",
