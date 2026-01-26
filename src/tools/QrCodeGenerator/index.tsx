@@ -134,6 +134,10 @@ export default function QrCodeGenerator() {
             <div className="grid lg:grid-cols-2 gap-8">
                 {/* Input Section */}
                 <div className="space-y-6">
+                    {/* Ad Banner */}
+                    <div className="flex justify-center">
+                        <BannerAd />
+                    </div>
                     <Tabs value={qrType} onValueChange={(v) => setQrType(v as QrType)}>
                         <TabsList className="grid grid-cols-4 w-full">
                             <TabsTrigger value="text">Text</TabsTrigger>

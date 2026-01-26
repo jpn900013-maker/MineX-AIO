@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { cn } from "@/lib/utils";
+import BannerAd from "@/components/BannerAd";
 
 interface ToolPageLayoutProps {
     title: string;
@@ -60,6 +61,11 @@ export function ToolPageLayout({
                 {/* Tool Content */}
                 <div className="glass rounded-xl p-6 md:p-8">
                     {children}
+                </div>
+
+                {/* Ad Banner - Below Tool Content */}
+                <div className="flex justify-center mt-8">
+                    <BannerAd />
                 </div>
             </main>
             <Footer />
