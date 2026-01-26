@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { Database, Server, RefreshCw, HardDrive, Users, FileText, Globe } from "lucide-react";
+import { Database, Server, RefreshCw, HardDrive, Users, FileText, Globe, Trash2, ArrowRightLeft } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
@@ -17,6 +17,7 @@ export default function AdminDashboard() {
     const [migrateUsers, setMigrateUsers] = useState(true);
     const [migrateTools, setMigrateTools] = useState(true);
     const [targetDb, setTargetDb] = useState(""); // For selective migration
+    const [sourceDb, setSourceDb] = useState(""); // For DB-to-DB migration
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -151,6 +152,58 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleDeleteDB = async (alias: string) => {
+        if (!confirm(`Delete "${alias}" from the list?`)) return;
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/api/admin/database/delete`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ alias })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast({ title: "Deleted", description: `Removed ${alias} from list` });
+                refreshData();
+            } else {
+                toast({ title: "Error", description: data.error, variant: "destructive" });
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDbToDbMigration = async () => {
+        if (!sourceDb || !targetDb || sourceDb === targetDb) {
+            return toast({ title: "Error", description: "Select different source and target databases", variant: "destructive" });
+        }
+        if (!confirm(`Migrate data from "${sourceDb}" to "${targetDb}"?`)) return;
+
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/api/admin/database/migrate-db`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({
+                    sourceAlias: sourceDb,
+                    targetAlias: targetDb,
+                    options: { users: migrateUsers, tools: migrateTools }
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast({
+                    title: "DB-to-DB Migration Complete",
+                    description: `Transferred ${data.count?.users || 0} users, ${data.count?.pastes || 0} pastes`
+                });
+            } else {
+                toast({ title: "Migration Failed", description: data.error, variant: "destructive" });
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (!stats) return <div className="p-8 text-green-500 font-mono">Loading System...</div>;
 
     return (
@@ -212,11 +265,16 @@ export default function AdminDashboard() {
                                         </div>
                                         <div className="text-[10px] opacity-50 truncate w-48">{db.url.substring(0, 25)}...</div>
                                     </div>
-                                    {db.active ? (
-                                        <Button onClick={handleDisconnect} variant="destructive" size="sm" className="h-7 text-xs rounded-none">Disconnect</Button>
-                                    ) : (
-                                        <Button onClick={() => handleSwitchDB(db.alias)} size="sm" className="h-7 text-xs bg-green-500/20 border border-green-500 hover:bg-green-500 hover:text-black rounded-none">Switch To</Button>
-                                    )}
+                                    <div className="flex gap-2">
+                                        {db.active ? (
+                                            <Button onClick={handleDisconnect} variant="destructive" size="sm" className="h-7 text-xs rounded-none">Disconnect</Button>
+                                        ) : (
+                                            <>
+                                                <Button onClick={() => handleSwitchDB(db.alias)} size="sm" className="h-7 text-xs bg-green-500/20 border border-green-500 hover:bg-green-500 hover:text-black rounded-none">Switch To</Button>
+                                                <Button onClick={() => handleDeleteDB(db.alias)} variant="destructive" size="sm" className="h-7 text-xs rounded-none"><Trash2 className="w-3 h-3" /></Button>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -266,6 +324,49 @@ export default function AdminDashboard() {
                                 <HardDrive className="w-4 h-4 mr-2" />
                                 Initiate Transfer
                             </Button>
+
+                            {/* DB-to-DB Migration */}
+                            <div className="mt-8 pt-6 border-t border-green-500/30">
+                                <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
+                                    <ArrowRightLeft className="w-4 h-4" /> DB-TO-DB MIGRATION
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label className="text-xs opacity-70">SOURCE</label>
+                                        <select
+                                            value={sourceDb}
+                                            onChange={(e) => setSourceDb(e.target.value)}
+                                            className="w-full bg-black border border-green-500/30 text-green-500 h-10 px-3 outline-none focus:border-green-500"
+                                        >
+                                            <option value="">-- Select Source --</option>
+                                            {databases.map(db => (
+                                                <option key={db.alias} value={db.alias}>{db.alias}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs opacity-70">TARGET</label>
+                                        <select
+                                            value={targetDb}
+                                            onChange={(e) => setTargetDb(e.target.value)}
+                                            className="w-full bg-black border border-green-500/30 text-green-500 h-10 px-3 outline-none focus:border-green-500"
+                                        >
+                                            <option value="">-- Select Target --</option>
+                                            {databases.map(db => (
+                                                <option key={db.alias} value={db.alias}>{db.alias}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={handleDbToDbMigration}
+                                    disabled={loading || databases.length < 2}
+                                    className="w-full bg-purple-600 hover:bg-purple-500 text-white rounded-none h-10 font-bold uppercase tracking-wider"
+                                >
+                                    <ArrowRightLeft className="w-4 h-4 mr-2" />
+                                    Migrate DB → DB
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>
