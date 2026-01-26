@@ -96,18 +96,18 @@ export default function IpLogger() {
     const simulateVisitor = async (linkId: string) => {
         // Fetch real IP info for demo purposes
         try {
-            const response = await fetch("http://ip-api.com/json/");
+            const response = await fetch("https://ipapi.co/json/");
             const data = await response.json();
 
             const visitor: VisitorLog = {
                 id: Date.now().toString(),
                 timestamp: new Date(),
-                ip: data.query || "Unknown",
+                ip: data.ip || "Unknown",
                 city: data.city || "Unknown",
-                region: data.regionName || "Unknown",
-                country: data.country || "Unknown",
-                postal: data.zip || "Unknown",
-                isp: data.isp || "Unknown",
+                region: data.region || "Unknown",
+                country: data.country_name || "Unknown",
+                postal: data.postal || "Unknown",
+                isp: data.org || "Unknown",
                 userAgent: navigator.userAgent,
                 referrer: document.referrer || "Direct",
             };
