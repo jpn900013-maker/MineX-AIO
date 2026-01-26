@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { InlineAd } from "@/components/AdBanner";
 
 type QrType = "text" | "url" | "wifi" | "email";
 
@@ -318,7 +317,6 @@ export default function QrCodeGenerator() {
                     </div>
 
                     {/* Download Buttons */}
-                    <InlineAd className="mb-4" />
                     <div className="flex flex-wrap gap-2">
                         <Button onClick={() => downloadQR("png")} variant="secondary" className="gap-2 flex-1">
                             <Download className="w-4 h-4" />

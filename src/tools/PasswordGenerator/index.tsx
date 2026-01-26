@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-import { InlineAd } from "@/components/AdBanner";
 
 interface PasswordOptions {
     length: number;
@@ -259,9 +258,6 @@ export default function PasswordGenerator() {
                         step={1}
                     />
                 </div>
-
-                {/* Ad before generate */}
-                <InlineAd />
 
                 {/* Generate Button */}
                 <Button onClick={generate} className="w-full gap-2" size="lg">

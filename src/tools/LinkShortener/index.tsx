@@ -4,7 +4,6 @@ import { ToolPageLayout } from "@/components/layout/ToolPageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { InlineAd } from "@/components/AdBanner";
 
 interface ShortenedLink {
     id: string;
@@ -123,9 +122,6 @@ export default function LinkShortener() {
             category="Link"
         >
             <div className="space-y-6">
-                {/* Ad placement */}
-                <InlineAd />
-
                 {/* URL Input */}
                 <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
                     <div className="space-y-2">
