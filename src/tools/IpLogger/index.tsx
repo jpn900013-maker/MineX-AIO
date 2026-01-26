@@ -133,7 +133,7 @@ export default function IpLogger() {
     };
 
     const copyLink = async (code: string) => {
-        const fullUrl = `https://minex.link/img/${code}`;
+        const fullUrl = `${window.location.origin}/img/${code}`;
         try {
             await navigator.clipboard.writeText(fullUrl);
             setCopied(true);
@@ -213,7 +213,7 @@ export default function IpLogger() {
                                 />
                                 <div className="flex-1">
                                     <Input
-                                        value={`https://minex.link/img/${selectedLink.code}`}
+                                        value={`${window.location.origin}/img/${selectedLink.code}`}
                                         readOnly
                                         className="font-mono bg-background/50"
                                     />
@@ -246,7 +246,7 @@ export default function IpLogger() {
                                                 className="w-10 h-10 object-cover rounded"
                                             />
                                             <div>
-                                                <p className="font-mono text-sm">minex.link/img/{link.code}</p>
+                                                <p className="font-mono text-sm">{window.location.host}/img/{link.code}</p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {link.visitors.length} visitor(s) • {formatDate(link.createdAt)}
                                                 </p>

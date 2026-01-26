@@ -210,7 +210,7 @@ export default function AdminDashboard() {
                                             {db.alias}
                                             {db.active && <span className="text-[10px] bg-green-500 text-black px-1 rounded font-bold animate-pulse">ACTIVE WRITER</span>}
                                         </div>
-                                        <div className="text-[10px] opacity-50 truncate w-48">{db.url}</div>
+                                        <div className="text-[10px] opacity-50 truncate w-48">{db.url.substring(0, 25)}...</div>
                                     </div>
                                     {db.active ? (
                                         <Button onClick={handleDisconnect} variant="destructive" size="sm" className="h-7 text-xs rounded-none">Disconnect</Button>

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 
-const API_URL = "http://localhost:3001";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
 interface Paste {
     id: string;
@@ -330,8 +330,8 @@ export default function Pastebin() {
                         <button
                             onClick={() => setUsePassword(!usePassword)}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${usePassword
-                                    ? "bg-primary/20 text-primary"
-                                    : "bg-muted text-muted-foreground"
+                                ? "bg-primary/20 text-primary"
+                                : "bg-muted text-muted-foreground"
                                 }`}
                         >
                             <Lock className="w-4 h-4" />

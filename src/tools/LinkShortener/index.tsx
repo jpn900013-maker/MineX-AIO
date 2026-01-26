@@ -70,7 +70,7 @@ export default function LinkShortener() {
             id: Date.now().toString(),
             originalUrl: urlToShorten,
             shortCode: code,
-            shortUrl: `minex.link/${code}`, // Simulated short URL
+            shortUrl: `${window.location.host}/${code}`, // Dynamic short URL
             createdAt: new Date(),
             clicks: 0,
         };
@@ -86,7 +86,7 @@ export default function LinkShortener() {
 
     const copyLink = async (link: ShortenedLink) => {
         try {
-            await navigator.clipboard.writeText(`https://${link.shortUrl}`);
+            await navigator.clipboard.writeText(`${window.location.origin}/${link.shortCode}`);
             setCopied(link.id);
             toast({ title: "Copied!", description: "Short URL copied to clipboard" });
             setTimeout(() => setCopied(null), 2000);
@@ -138,7 +138,7 @@ export default function LinkShortener() {
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground">Custom Alias (optional)</label>
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">minex.link/</span>
+                            <span className="text-sm text-muted-foreground">{window.location.host}/</span>
                             <Input
                                 value={customAlias}
                                 onChange={(e) => setCustomAlias(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
