@@ -61,12 +61,33 @@ export default function IpLogger() {
         setLoading(true);
 
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             const imageDataUrl = event.target?.result as string;
+            const code = generateCode();
+
+            // Save to backend API
+            const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+            try {
+                const response = await fetch(`${API_URL}/api/iplogger/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('minex-token') || ''}`
+                    },
+                    body: JSON.stringify({ imageData: imageDataUrl, code })
+                });
+                const data = await response.json();
+
+                if (!data.success) {
+                    console.warn('Backend save failed, using localStorage only');
+                }
+            } catch (err) {
+                console.warn('Backend API unavailable, using localStorage only');
+            }
 
             const newLink: TrackedLink = {
                 id: Date.now().toString(),
-                code: generateCode(),
+                code,
                 imageDataUrl,
                 createdAt: new Date(),
                 visitors: [],
