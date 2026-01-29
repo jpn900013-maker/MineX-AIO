@@ -6,8 +6,26 @@
 
 Get the entire system (Frontend + Backend) running with just one command:
 
+### Option 1: Single Command (Recommended)
+This starts both the Frontend and Backend automatically.
 ```bash
+cd Frontend
 npm start
+```
+
+### Option 2: Split Terminal (Manual)
+If you prefer running them in separate terminals:
+
+**Terminal 1 (Backend):**
+```bash
+cd server
+node index.js
+```
+
+**Terminal 2 (Frontend):**
+```bash
+cd Frontend
+npm run dev
 ```
 
 This will launch:
