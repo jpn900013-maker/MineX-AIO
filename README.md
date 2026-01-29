@@ -1,8 +1,8 @@
-# Freebie.com.ua - Ultimate AIO Tools
+# MineX AIO - Ultimate Toolkit
 
-> The Ultimate All-in-One Toolkit with over 60+ tools, featuring advanced authentication, multi-database management, and enterprise-grade security.
+> The Ultimate All-in-One Toolkit featuring advanced Minecraft Bot Management, Account Generation, and 60+ Developer Tools.
 
-## 🚀 Quick Start (Single Command)
+## 🚀 Quick Start
 
 Get the entire system (Frontend + Backend) running with just one command:
 
@@ -13,13 +13,11 @@ cd Frontend
 npm start
 ```
 
-### Option 2: Split Terminal (Manual)
-If you prefer running them in separate terminals:
-
+### Option 2: Manual
 **Terminal 1 (Backend):**
 ```bash
 cd server
-node index.js
+npm start
 ```
 
 **Terminal 2 (Frontend):**
@@ -28,13 +26,9 @@ cd Frontend
 npm run dev
 ```
 
-This will launch:
-- **Frontend**: http://localhost:8080
-- **Backend**: http://localhost:3001
-
 ## 🔑 Admin Access
 
-Access the **System Control Panel** to manage databases and view analytics.
+Access the **System Control Panel** to manage users, bots, and databases.
 
 - **URL**: [http://localhost:8080/admin/login](http://localhost:8080/admin/login)
 - **Operator ID**: `operators130@gmail.com`
@@ -42,43 +36,34 @@ Access the **System Control Panel** to manage databases and view analytics.
 
 ---
 
-## 🔥 Features
+## 🔥 Key Features
+
+### 🤖 Minecraft Bot Manager
+- **Web-Based Client**: Control MC bots directly from your browser.
+- **Persistent Sessions**: Bots stay online 24/7 on the backend.
+- **Features**: Live Chat, Auto-Reconnect, Auto-Movement, Inventory, and visual dashboard.
+- **Economy**: Credit-based system for bot hosting.
+
+### 🎮 Account Generator
+- **Premium Accounts**: Instantly generate accounts for various services.
+- **Stock Management**: Admin tools to add/remove stock.
 
 ### 🛠️ 60+ Developer Tools
-- **Text**: Pastebin, Word Counter, Lorem Ipsum...
-- **Network**: IP Logger, DNS Lookup, Ping Test...
-- **Multimedia**: YouTube Downloader, Audio Converter, Image Resizer...
-- **Minecraft**: Server Status, Bot Sender, Skin Viewer...
-- **Security**: Password Generator, Hash Generator, JWT Decoder...
+- **Network**: IP Logger, DNS Lookup, Ping Test, IP Lookup (Proxy supported).
+- **Multimedia**: YouTube Downloader, Audio Converter, Image Resizer.
+- **Security**: Password Generator, Hash Generator, JWT Decoder.
 
-### 👤 User System
-- **Registration & Login**: Secure JWT-based authentication.
-- **History Dashboard**: Users can track their created Pastes and IP Logs.
-- **Private Data**: Content is linked to the user's account.
-
-### 🛡️ Admin & Database System
-- **Database Fleet**: Connect multiple MongoDB instances simultaneously.
-- **Hot-Swapping**: Switch active databases instantly without downtime.
-- **Selective Migration**: Transfer data (Users/Tools) from RAM to any connected MongoDB with one click.
-- **Live Analytics**: Monitor active users, bots, and total data usage.
-
-### 🔒 Enterprise Security
-- **Anti-Theft**: Right-click and DevTools (F12) are disabled to protect source code.
-- **Intrusion Detection**: Automatic lockdown screen if inspection is attempted.
+### �️ Enterprise Architecture
+- **Strict MongoDB**: All data is persisted securely. No data loss on restart.
+- **JWT Auth**: Secure user sessions and API protection.
+- **Role-Based Access**: Granular control for Users vs Admins.
 
 ---
 
 ## 📂 Project Structure
 
-- **src/**: React Frontend (Vite + Tailwind + Shadcn)
-- **server/**: Node.js/Express Backend
-    - `index.js`: Main API Server
-    - `database.js`: Advanced Database Manager (Multi-DB Handler)
-
-## 📦 Data Storage
-
-By default, the server runs in **In-Memory Mode** (RAM). Data is reset on restart.
-To persist data, login to the **Admin Panel** and connect a **MongoDB**.
+- **Frontend/**: React (Vite + Tailwind + Shadcn)
+- **server/**: Node.js (Express + Socket.io + Mineflayer)
 
 ---
-*MineX AIO Hub © 2026*
+*MineX AIO © 2026*
