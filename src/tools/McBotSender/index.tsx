@@ -269,6 +269,10 @@ export default function McBotSender() {
                     if (data.bot?.status === 'online') {
                         connectSocket(data.bot.sessionId);
                     }
+                    // Sync config from server
+                    if (data.bot.config) {
+                        setConfig(prev => ({ ...prev, ...data.bot.config }));
+                    }
                 }
             }
         } catch (e) {
@@ -384,6 +388,24 @@ export default function McBotSender() {
 
     const formatTime = (date: Date) => {
         return new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    };
+
+    const updateBotConfig = async (newConfig: Partial<BotConfig>) => {
+        // Optimistic update
+        setConfig(prev => ({ ...prev, ...newConfig }));
+
+        if (hasBot) {
+            try {
+                await fetch(`${API_URL}/api/bot/config/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ config: newConfig })
+                });
+            } catch (e) {
+                console.error("Failed to update config", e);
+                toast({ title: "Update Failed", variant: "destructive" });
+            }
+        }
     };
 
     return (
@@ -508,7 +530,7 @@ export default function McBotSender() {
                                     </div>
                                     <Switch
                                         checked={config.autoReconnect}
-                                        onCheckedChange={(v) => setConfig({ ...config, autoReconnect: v })}
+                                        onCheckedChange={(v) => updateBotConfig({ autoReconnect: v })}
                                     />
                                 </div>
                                 <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-white/5">
@@ -518,7 +540,7 @@ export default function McBotSender() {
                                     </div>
                                     <Switch
                                         checked={config.autoRespawn}
-                                        onCheckedChange={(v) => setConfig({ ...config, autoRespawn: v })}
+                                        onCheckedChange={(v) => updateBotConfig({ autoRespawn: v })}
                                     />
                                 </div>
                                 <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-white/5">
@@ -528,7 +550,7 @@ export default function McBotSender() {
                                     </div>
                                     <Switch
                                         checked={config.autoChat}
-                                        onCheckedChange={(v) => setConfig({ ...config, autoChat: v })}
+                                        onCheckedChange={(v) => updateBotConfig({ autoChat: v })}
                                     />
                                 </div>
                                 <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-white/5">
@@ -538,7 +560,7 @@ export default function McBotSender() {
                                     </div>
                                     <Switch
                                         checked={config.randomMovement}
-                                        onCheckedChange={(v) => setConfig({ ...config, randomMovement: v })}
+                                        onCheckedChange={(v) => updateBotConfig({ randomMovement: v })}
                                     />
                                 </div>
 
