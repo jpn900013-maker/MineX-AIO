@@ -1,0 +1,353 @@
+/* AdminDashboard.css - Admin Panel Styles */
+
+.admin-page {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0B0B0F;
+    color: #E5E5E5;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-header {
+    background: #141418;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #C084FC;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-container {
+    margin: 30px auto;
+    width: 90%;
+    max-width: 900px;
+    background: #141418;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.section-title {
+    margin: 20px 0;
+    color: #C084FC;
+    font-weight: 600;
+    text-align: left;
+    font-size: 1.3rem;
+}
+
+/* Navigation Grid */
+.admin-nav-grid {
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.nav-btn {
+    padding: 10px 16px;
+    color: #fff;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-btn.purple {
+    background: #8B5CF6;
+}
+
+.nav-btn.purple:hover {
+    background: #7C3AED;
+}
+
+.nav-btn.green {
+    background: #10B981;
+}
+
+.nav-btn.green:hover {
+    background: #059669;
+}
+
+.nav-btn.orange {
+    background: #F59E0B;
+}
+
+.nav-btn.orange:hover {
+    background: #D97706;
+}
+
+.nav-btn.blue {
+    background: #3B82F6;
+}
+
+.nav-btn.blue:hover {
+    background: #2563EB;
+}
+
+.nav-btn.pink {
+    background: #EC4899;
+}
+
+.nav-btn.pink:hover {
+    background: #DB2777;
+}
+
+.nav-btn.cyan {
+    background: #06B6D4;
+}
+
+.nav-btn.cyan:hover {
+    background: #0891B2;
+}
+
+/* Service Box */
+.service-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1C1C20;
+    padding: 14px 20px;
+    border-radius: 10px;
+    margin: 12px 0;
+    transition: all 0.3s ease;
+}
+
+.service-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.25);
+}
+
+.service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.service-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.service-meta {
+    font-size: 13px;
+    color: #888;
+}
+
+.service-restock {
+    font-size: 12px;
+    color: #666;
+}
+
+.service-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Buttons */
+button,
+input[type="submit"] {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.visit-btn {
+    background: #8B5CF6;
+    color: #fff;
+}
+
+.visit-btn:hover {
+    background: #7C3AED;
+    transform: scale(1.05);
+}
+
+.clear-btn {
+    background: #D32F2F;
+    color: #fff;
+}
+
+.clear-btn:hover {
+    background: #F44336;
+    transform: scale(1.05);
+}
+
+.clear-btn:disabled,
+.visit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Stock Count Badges */
+.stock-count {
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.stock-high {
+    color: #10B981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.stock-medium {
+    color: #F59E0B;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.stock-low {
+    color: #EF4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Form Box */
+.form-box {
+    background: #1C1C20;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 35px;
+    text-align: left;
+}
+
+.form-box label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.form-box select {
+    width: 100%;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: none;
+    padding: 10px;
+    background: #121212;
+    color: #fff;
+    font-size: 14px;
+}
+
+.form-box select:focus {
+    outline: 2px solid #8B5CF6;
+}
+
+.accounts-textarea {
+    width: 100%;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: none;
+    padding: 10px;
+    background: #121212 !important;
+    color: #fff !important;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    min-height: 150px;
+    resize: vertical;
+}
+
+.accounts-textarea:focus {
+    outline: 2px solid #8B5CF6;
+}
+
+.form-box input[type="submit"] {
+    margin-top: 15px;
+    padding: 12px 20px;
+    width: 100%;
+    border-radius: 6px;
+    border: none;
+    background: #8B5CF6;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-box input[type="submit"]:hover {
+    background: #7C3AED;
+    transform: scale(1.02);
+}
+
+.form-box input[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Flash Messages */
+.flash {
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.flash.success {
+    background: rgba(46, 125, 50, 0.2);
+    color: #A5D6A7;
+}
+
+.flash.info {
+    background: rgba(30, 136, 229, 0.2);
+    color: #90CAF9;
+}
+
+.flash.error {
+    background: rgba(211, 47, 47, 0.2);
+    color: #EF9A9A;
+}
+
+/* Logout */
+.logout {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.logout a {
+    color: #F87171;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logout a:hover {
+    color: #EF4444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .service-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .service-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .admin-nav-grid {
+        grid-template-columns: 1fr;
+    }
+}

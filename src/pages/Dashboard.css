@@ -1,0 +1,325 @@
+/* Dashboard.css - User Dashboard Styles */
+
+.dashboard-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0B0B0F 0%, #1a1a2e 100%);
+    color: #E5E5E5;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+.welcome-section {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(192, 132, 252, 0.05));
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #C084FC, #8B5CF6, #C084FC);
+    background-size: 200% 100%;
+    animation: gradient 3s ease infinite;
+}
+
+@keyframes gradient {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff, #C084FC);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.welcome-section p {
+    color: #A3A3A3;
+    font-size: 1.1rem;
+}
+
+.flash {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 14px;
+    border-left: 4px solid;
+}
+
+.flash.success {
+    background: rgba(46, 125, 50, 0.15);
+    color: #A5D6A7;
+    border-color: #66BB6A;
+}
+
+.flash.error {
+    background: rgba(211, 47, 47, 0.15);
+    color: #EF9A9A;
+    border-color: #EF5350;
+}
+
+.flash.info {
+    background: rgba(30, 136, 229, 0.15);
+    color: #90CAF9;
+    border-color: #42A5F5;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #C084FC;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: linear-gradient(180deg, #C084FC, #8B5CF6);
+    border-radius: 4px;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.card {
+    background: rgba(20, 20, 24, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(192, 132, 252, 0.4);
+    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.3);
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.card h3 {
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.card p {
+    color: #A3A3A3;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    position: relative;
+    z-index: 1;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+    color: #fff;
+}
+
+.history-section {
+    background: rgba(20, 20, 24, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.history-item {
+    background: rgba(28, 28, 32, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.history-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #8B5CF6, #C084FC);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.history-item:hover {
+    background: rgba(35, 35, 43, 0.9);
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateX(8px);
+}
+
+.history-item:hover::before {
+    opacity: 1;
+}
+
+.history-service {
+    color: #C084FC;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.history-service::before {
+    content: '🎮';
+}
+
+.history-account {
+    color: #E5E5E5;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    word-break: break-all;
+}
+
+.history-time {
+    color: #666;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.history-time::before {
+    content: '🕒';
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-container {
+        padding: 1.5rem 1rem;
+    }
+
+    /* Mobile Performance Optimizations */
+    .card,
+    .history-section {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(20, 20, 24, 0.95);
+        /* Opaque fallback */
+        box-shadow: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card::before,
+    .history-item::before,
+    .welcome-section::before {
+        display: none;
+        /* detailed gradients can be heavy */
+    }
+
+    .card:hover {
+        transform: none !important;
+    }
+
+    .history-item {
+        background: #1a1a20;
+    }
+}
