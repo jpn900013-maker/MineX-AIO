@@ -1,11 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 import { Bot, Send, Play, Square, Settings, MessageSquare, Gamepad2, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { ToolPageLayout } from "@/components/layout/ToolPageLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { io, Socket } from "socket.io-client";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
@@ -56,7 +66,8 @@ export default function McBotSender() {
     const chatEndRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
     const { toast } = useToast();
-    const token = localStorage.getItem("minex-token");
+    const { token, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     // Premium Modes State
     const [unlockedModes, setUnlockedModes] = useState<string[]>([]);
@@ -77,6 +88,8 @@ export default function McBotSender() {
     const [adminTier, setAdminTier] = useState("1");
     const [adminDays, setAdminDays] = useState("30");
 
+    const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+
     useEffect(() => {
         if (token) fetchUnlockedModes();
     }, [token]);
@@ -95,6 +108,7 @@ export default function McBotSender() {
     };
 
     const unlockMode = async (mode: string) => {
+        if (!isAuthenticated) return navigate("/login");
         if (isPremium) return; // Should be auto-unlocked
 
         let cost = 150; // Default for Attack, Mining, Butcher
@@ -176,7 +190,8 @@ export default function McBotSender() {
 
 
     const upgradeToPremium = (packageId: string) => {
-        alert("To upgrade, please contact the Admin on Discord.\n\nAdmin ID: 941139424580890666\n\nPayment is NON-REFUNDABLE. Once paid, the admin will grant you access.");
+        if (!isAuthenticated) return navigate("/login");
+        setShowPaymentDialog(true);
     };
 
     const grantPremium = async () => {
@@ -281,7 +296,7 @@ export default function McBotSender() {
     };
 
     const launchBot = async () => {
-        if (!token) return toast({ title: "Login Required", variant: "destructive" });
+        if (!isAuthenticated) return navigate("/login");
         if (!config.serverAddress) return toast({ title: "Server Required", variant: "destructive" });
         setConnecting(true);
         try {
@@ -762,6 +777,51 @@ export default function McBotSender() {
                     <p className="text-xs text-muted-foreground leading-relaxed">Improved persistent backend ensures your bot stays registered for 7 days. Automatic deployment on start.</p>
                 </div>
             </div>
+
+            <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+                <DialogContent className="sm:max-w-md border-yellow-500/20 bg-black/90">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl text-yellow-400 flex items-center gap-2">
+                            👑 Upgrade to Premium
+                        </DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            Unlock all modes including Attack, Mining, and Follow.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 py-4">
+                        <div className="p-4 rounded-lg bg-yellow-950/20 border border-yellow-500/20 space-y-2">
+                            <h4 className="font-semibold text-yellow-200">How to Purchase</h4>
+                            <p className="text-sm text-gray-300 leading-relaxed">
+                                Premium subscriptions are manually handled by our admin team on Discord.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Admin Discord ID</label>
+                            <div className="flex items-center gap-2 bg-black/50 p-2 rounded border border-white/10 font-mono text-sm text-white">
+                                941139424580890666
+                            </div>
+                        </div>
+
+                        <div className="text-xs text-red-400 flex items-center gap-1 bg-red-950/20 p-2 rounded border border-red-900/40">
+                            <span className="font-bold">NOTE:</span> Payments are NON-REFUNDABLE.
+                        </div>
+                    </div>
+
+                    <DialogFooter className="sm:justify-start">
+                        <Button
+                            type="button"
+                            variant="default"
+                            className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white"
+                            onClick={() => window.open("https://discord.com/users/941139424580890666", "_blank")}
+                        >
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Contact Admin on Discord
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </ToolPageLayout>
     );
 }
